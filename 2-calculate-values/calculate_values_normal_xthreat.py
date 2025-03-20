@@ -95,19 +95,21 @@ grid_sizes = [
 ]
 
 # The bootstraps performed in one run
-max_partition_size = 1042
+max_partition_size = 16 #1042
 
 # Create a list with all combinations and assign a unique random_state and partition number
 sampling_params = {}
 for n_x, n_y in grid_sizes:
     for sample_size in sample_sizes:
         for i_bootstrap in range(n_bootstraps):
-            random_state = 42 + (n_x + n_y) * n_bootstraps * 42 + sample_size
+            random_state = 42 + (n_x + n_y) * n_bootstraps * 42 + sample_size + i_bootstrap
             i_partition = i_bootstrap // max_partition_size
             sampling_params[(sample_size, n_x, n_y, i_bootstrap)] = (random_state, i_partition)
 
 # Specify norms of interest
-norms = [1, 2, np.inf]
+# norms = [1, 2, np.inf]
+norms = [1, np.inf]
+# norms = [2]
 
 # Specify parameters of interest
 columns = ['n_x', 'n_y', 'sample_size', 'i_bootstrap', 'random_state']
@@ -142,10 +144,11 @@ for (sample_size, n_x, n_y, i_bootstrap), (random_state, i_partition) in tasks[s
     counter += 1
     if counter % 100 == 0 and rank==0:
         print(f'Were currently at {counter} of {len(tasks[start_idx:end_idx])} at one of {size} nodes.')
-    local_dict_errors = add_errors_to_dict(
-        local_dict_errors, true_model_path, resampled_model_path, 
-        n_x, n_y, sample_size, i_bootstrap, random_state, norms
-    )
+    if i_partition == 0:
+        local_dict_errors = add_errors_to_dict(
+            local_dict_errors, true_model_path, resampled_model_path, 
+            n_x, n_y, sample_size, i_bootstrap, random_state, norms
+        )
 
 # Gather results from all ranks at rank 0
 all_results = comm.gather(local_dict_errors, root=0)

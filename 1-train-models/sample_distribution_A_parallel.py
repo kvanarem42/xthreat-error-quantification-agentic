@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpi4py import MPI
 
-sys.path.append("../")
+sys.path.append("/home/kwvanarem/xthreat-research-v1/run-18-03-2025/")
 from xThreat import xThreat
 
 script_starting_time = time.time()
@@ -40,14 +40,14 @@ sampling_params = {}
 for n_x, n_y in grid_sizes:
     for sample_size in sample_sizes:
         for i_bootstrap in range(n_bootstraps):
-            random_state = 42 + (n_x + n_y) * n_bootstraps * 42 + sample_size
+            random_state = 42 + (n_x + n_y) * n_bootstraps * 42 + sample_size + i_bootstrap
             i_partition = i_bootstrap // max_partition_size
             sampling_params[(sample_size, n_x, n_y, i_bootstrap)] = (random_state, i_partition)
 if rank == 0:
     print(f'Number of individual bootstraps: {len(sampling_params)}')
 
 # Load the data
-data_path = 'xThreat_data_v2.parquet'
+data_path = '../../xThreat_data_v2.parquet'
 df_events = pd.read_parquet(data_path, engine='fastparquet')
 df_events['shot'] = ~df_events['shot_outcome'].isna()
 df_events['goal'] = df_events['shot_outcome'] == 'Goal'
