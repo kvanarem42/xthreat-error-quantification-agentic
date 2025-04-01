@@ -44,6 +44,7 @@ class xThreat:
         self.probability_shooting = None
 
         self.xG = None
+        self.xG_std = None
 
         self.max_errors = None
         self.xT = None
@@ -178,8 +179,8 @@ class xThreat:
     #     self.probability_shooting = self.transition_matrix[:self.n_game_states, self.shot_state]
 
 
-    def _calculate_xG(self, df_events):
-        """Calculate the xG value for each in-game state."""
+    def _calculate_xG_from_data(self, df_events):
+        """Calculate the xG value from the data for each in-game state."""
         # Initialize the xG values
         self.xG = np.zeros(self.n_game_states)
 
@@ -191,6 +192,27 @@ class xThreat:
 
         # Calculate the xG values
         self.xG[xG_counts['state'].astype(int)] = np.where(xG_counts['shot'] > 0, xG_counts['goal']/xG_counts['shot'], 0)
+
+        # Calculate the corresponding standard deviation
+        self.xG_std = np.sqrt(self.xG * (1 - self.xG))
+
+    def _calculate_xG_from_xG_model(self, df_events, xG_column = 'xG'):
+        """Calculate the xG value from the existing xG values for each in-game state."""
+        # Initialize the xG values
+        self.xG = np.zeros(self.n_game_states)
+        self.xG_std = np.zeros(self.n_game_states)
+
+        # Calculate the average probability of scoring in each state
+        xG_means = df_events[df_events['shot'] == True].groupby('state')[xG_column].mean().reset_index()
+        xG_std = df_events[df_events['shot'] == True].groupby('state')[xG_column].std().reset_index()
+
+        # Limit the values to the number of in-game states
+        xG_means = xG_means[xG_means['state'] < self.n_game_states]
+        xG_std = xG_std[xG_std['state'] < self.n_game_states]
+
+        # Calculate the xG values and the corresponding standard deviation
+        self.xG[xG_means['state'].astype(int)] = xG_means[xG_column]
+        self.xG_std[xG_std['state'].astype(int)] = xG_std[xG_column]
 
     def _calculate_xThreat(self, max_iterations: int = 1000, convergence_threshold: float = 1e-6):
         """Calculate the xThreat value for each in-game state."""
@@ -381,6 +403,7 @@ class xThreat:
             df_events, 
             max_iterations: int = 1000, 
             convergence_threshold: float = 1e-6, 
+            xG_column: str = None,
             filter_events: bool = True,
             apply_symmetry: bool = False,
             fill_empty_states: bool = False,
@@ -392,7 +415,8 @@ class xThreat:
         Parameters:
         - df_events: The dataframe with the events, should include the columns 'x', 'y', 'next_x', 'next_y', 'goal', 'shot', 'possession_kept', 'chain_length'.
         - max_iterations: The maximum number of iterations for the xThreat calculation.
-        - tolerance: The tolerance for the xThreat calculation.
+        - convergence_threshold: The tolerance for the xThreat calculation.
+        - xG_column: The columns with xG values of shots. If None, a goal is taken as 1 and a miss as 0. 
         - filter_events: An indicator whether or not events can be out of bounds and filtering is necessary. Default is to apply filtering. Turning it off might significantly increase computation speed.
         - fill_empty_states: An indicator whether or not empty states should be imputed with the average of their neighbours.
         - apply_gaussian_filtering: An indicator whether or not Gaussian filtering should be applied to the xG values, transition matrix, beginning distribution, and average distribution.
@@ -431,7 +455,10 @@ class xThreat:
 
         # Calculate the xG values
         # begin_time = time.time()
-        self._calculate_xG(df_events)
+        if xG_column is None:
+            self._calculate_xG_from_data(df_events)
+        else:
+            self._calculate_xG_from_xG_model(df_events, xG_column)
         # print(f'Calculating xG took {time.time()-begin_time:.5f} seconds.')
 
         # Calculate the initial distribution
