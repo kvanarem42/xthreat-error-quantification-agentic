@@ -1,3 +1,13 @@
+# Custom directories
+data-storage/
+0-model-storage/
+
+# Custom files
+to-do.txt
+xThreat_data_v2.parquet
+xThreat_data_v3.parquet
+temp.parquet
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
