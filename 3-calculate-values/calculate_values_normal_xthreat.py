@@ -1,3 +1,13 @@
+########################################################################
+### This script calculates the errors of the resampled xThreat models
+### models compared to the true xThreat model.
+### The errors are calculated for different norms (1 and inf; 
+### 2 norm is left out for computational speed).
+###
+### The script is run on the DelftBlue computing cluster to speed up  
+### the calculations.
+########################################################################
+
 ### Import statements ###
 import time
 import sys, os
@@ -11,7 +21,7 @@ from xThreat import xThreat
 
 script_starting_time = time.time()
 
-### Support functions ###
+############## Support functions ##############
 def create_error_objects(xT_true, xT):
     # Calculate the error for attributes of the Expected Threat model
     xT_error = xT_true.xT-xT.xT
@@ -74,7 +84,7 @@ def add_errors_to_dict(dict_errors, true_model_path, resampled_model_path, n_x, 
 
     return dict_errors
 
-### Calculations ###
+############## Calculations ##############
 
 # Initialize MPI
 comm = MPI.COMM_WORLD
@@ -109,7 +119,6 @@ for n_x, n_y in grid_sizes:
 # Specify norms of interest
 # norms = [1, 2, np.inf]
 norms = [1, np.inf]
-# norms = [2]
 
 # Specify parameters of interest
 columns = ['n_x', 'n_y', 'sample_size', 'i_bootstrap', 'random_state']

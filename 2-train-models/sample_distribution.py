@@ -1,3 +1,10 @@
+##################################################################################
+### This script is a non-parallelized version of the script that calculates the
+### errors.
+### It is kept as a reference for the parallelized version.
+##################################################################################
+
+
 import time
 import sys, os
 import pandas as pd

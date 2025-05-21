@@ -47,7 +47,7 @@ if rank == 0:
     print(f'Number of individual bootstraps: {len(sampling_params)}')
 
 # Load the data
-data_path = '../../xThreat_data_v2.parquet'
+data_path = '../../xThreat_data_v3.parquet'
 df_events = pd.read_parquet(data_path, engine='fastparquet')
 df_events['shot'] = ~df_events['shot_outcome'].isna()
 df_events['goal'] = df_events['shot_outcome'] == 'Goal'
