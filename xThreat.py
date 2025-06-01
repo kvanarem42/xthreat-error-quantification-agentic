@@ -8,6 +8,7 @@ from scipy.ndimage import gaussian_filter
 from scipy.sparse import csr_matrix
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import copy
 import pickle
 
@@ -499,6 +500,9 @@ class xThreat:
                            cmap='hot', 
                            colorbar_label='',
                            line_color='black',
+                           edgecolors=None,
+                           linewidths=0.01,
+                           edge_alpha=1,
                            ):
         """Plot a heatmap on a pitch.
         Parameters:
@@ -507,6 +511,10 @@ class xThreat:
         - cmap: The colormap to use.
         - colorbar_label: The label of the colorbar.
         - line_color: The color of the lines on the pitch.
+        - edgecolors: The color of the edges of the heatmap.
+        - edgewidths: The width of the lines of the heatmap.
+        - edge_alpha: The alpha value of the edges of the heatmap.
+
 
         Returns:
         - fig: The figure object.
@@ -527,19 +535,41 @@ class xThreat:
         x = x_bin_size*(0.5+x)
         y = y_bin_size*(0.5+y)
 
+        # # Add lines for the game states
+        # if state_line_color != 'None':
+        #     for x_i in range(self.n_x):
+        #         ax.axvline(x=x_bin_size*(x_i+0.5), color=state_line_color, lw=1, zorder=2)
+        #     for y_i in range(self.n_y):
+        #         ax.axhline(y=y_bin_size*(y_i+0.5), color=state_line_color, lw=1, zorder=2)
+
+
         # Plot the heatmap
         bin_statistic = pitch.bin_statistic(x, y, values, statistic='min', bins=[self.n_x, self.n_y])
-        heatmap = pitch.heatmap(bin_statistic, ax=ax, cmap=cmap)
+        if edgecolors != None:
+            edgecolors = mpl.colors.to_rgba(edgecolors, alpha=edge_alpha)
+        heatmap = pitch.heatmap(bin_statistic, ax=ax, cmap=cmap, edgecolors=edgecolors, linewidths=linewidths)
 
         # Add colorbar and labels
-        cbar = fig.colorbar(heatmap, ax=ax, shrink=0.6)
-        cbar.set_label(label=colorbar_label)
+        cbar = fig.colorbar(heatmap, ax=ax, shrink=0.8)
+        cbar.set_ticks(
+            np.linspace(np.min(values), np.max(values), 5), 
+            labels=np.round(np.linspace(np.min(values), np.max(values), 5), decimals=2),
+            )
+        # cbar.set_ticks(np.round(np.linspace(np.min(values), np.max(values), 5), decimals=2))
+        cbar.ax.set_title(colorbar_label, weight='bold', pad=10)
+        for label in cbar.ax.get_yticklabels():
+            label.set_fontweight('bold')
+
+        # cbar.set_title(label=colorbar_label, size=14)
         return fig, ax, cbar
 
     def plot_xThreat(self,
                         cmap = 'hot',
                         figsize=(10.5, 6.8),
                         line_color='black',
+                        edgecolors=None,
+                        linewidths=0.01,
+                        edge_alpha=1,
                         ):
         """Plot the xThreat values on the pitch.
         Parameters:
@@ -548,7 +578,16 @@ class xThreat:
         - line_color: The color of the lines on the pitch.
         """
         # Plot the heatmap
-        fig, ax, cbar = self.plot_pitch_heatmap(self.xT[:self.n_game_states], figsize=figsize, cmap=cmap, colorbar_label='xThreat', line_color=line_color)
+        fig, ax, cbar = self.plot_pitch_heatmap(
+            self.xT[:self.n_game_states], 
+            figsize=figsize, 
+            line_color=line_color,
+            cmap=cmap, 
+            colorbar_label='xThreat', 
+            edgecolors=edgecolors,
+            linewidths=linewidths,
+            edge_alpha=edge_alpha,
+            )
         plt.show()
 
     def plot_xG(self,
