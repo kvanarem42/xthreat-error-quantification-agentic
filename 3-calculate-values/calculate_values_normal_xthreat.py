@@ -16,7 +16,7 @@ import numpy as np
 from mpi4py import MPI
 
 
-sys.path.append("/home/kwvanarem/xthreat-research-v1/run-18-03-2025/")
+sys.path.append("/home/kwvanarem/xthreat-research-v2/run-06-01-2026/")
 from xThreat import xThreat
 
 script_starting_time = time.time()
@@ -30,8 +30,9 @@ def create_error_objects(xT_true, xT):
     prob_shot_error = xT_true.probability_shooting - xT.probability_shooting
     transition_matrix_error = xT_true.transition_matrix[:xT_true.n_game_states,:xT_true.n_game_states] \
         - xT.transition_matrix[:xT.n_game_states,:xT.n_game_states]
+    weighted_transition_matrix_error = transition_matrix_error * xT.xT[np.newaxis, :]
     
-    return xT_error, g_error, xG_error, prob_shot_error, transition_matrix_error
+    return xT_error, g_error, xG_error, prob_shot_error, transition_matrix_error, weighted_transition_matrix_error
 
 def calculate_error_per_norm(xT_true, xT, norm):
     """
@@ -50,15 +51,16 @@ def calculate_error_per_norm(xT_true, xT, norm):
     - transition_matrix_error_norm (float): The error in the transition
         matrix
     """
-    xT_error, g_error, xG_error, prob_shot_error, transition_matrix_error = create_error_objects(xT_true, xT)
+    xT_error, g_error, xG_error, prob_shot_error, transition_matrix_error, weighted_transition_matrix_error_norm = create_error_objects(xT_true, xT)
     
     xT_error_norm = np.linalg.norm(xT_error, ord=norm)
     g_error_norm = np.linalg.norm(g_error, ord=norm)
     xG_error_norm = np.linalg.norm(xG_error, ord=norm)
     prob_shot_error_norm = np.linalg.norm(prob_shot_error, ord=norm)
     transition_matrix_error_norm = np.linalg.norm(transition_matrix_error, ord=norm)
+    weighted_transition_matrix_error_norm = np.linalg.norm(weighted_transition_matrix_error_norm, ord=norm)
     
-    return xT_error_norm, g_error_norm, xG_error_norm, prob_shot_error_norm, transition_matrix_error_norm
+    return xT_error_norm, g_error_norm, xG_error_norm, prob_shot_error_norm, transition_matrix_error_norm, weighted_transition_matrix_error_norm
 
 def add_errors_to_dict(dict_errors, true_model_path, resampled_model_path, n_x, n_y, sample_size, i_bootstrap, random_state, norms):
 
@@ -73,7 +75,7 @@ def add_errors_to_dict(dict_errors, true_model_path, resampled_model_path, n_x, 
     
 
     for norm in norms:
-        xT_error_norm, g_error_norm, xG_error_norm, prob_shot_error_norm, transition_matrix_error_norm = calculate_error_per_norm(xT_true, xT_sampled, norm)
+        xT_error_norm, g_error_norm, xG_error_norm, prob_shot_error_norm, transition_matrix_error_norm, weighted_transition_matrix_error_norm = calculate_error_per_norm(xT_true, xT_sampled, norm)
         dict_errors[f'xT_error_{norm}_norm'].append(xT_error_norm)
         dict_errors[f'g_error_{norm}_norm'].append(g_error_norm)
         dict_errors[f'xG_error_{norm}_norm'].append(xG_error_norm)
@@ -81,6 +83,7 @@ def add_errors_to_dict(dict_errors, true_model_path, resampled_model_path, n_x, 
         dict_errors[f'transition_matrix_error_{norm}_norm'].append(transition_matrix_error_norm)
         dict_errors[f'transition_matrix_true_{norm}_norm'].append(np.linalg.norm(xT_true.transition_matrix, ord=norm))
         dict_errors[f'transition_matrix_resampled_{norm}_norm'].append(np.linalg.norm(xT_sampled.transition_matrix, ord=norm))
+        dict_errors[f'weighted_transition_matrix_error_{norm}_norm'].append(weighted_transition_matrix_error_norm)
 
     return dict_errors
 
@@ -105,7 +108,7 @@ grid_sizes = [
 ]
 
 # The bootstraps performed in one run
-max_partition_size = 16 #1042
+max_partition_size = 1042
 
 # Create a list with all combinations and assign a unique random_state and partition number
 sampling_params = {}
@@ -131,11 +134,12 @@ for norm in norms:
         f'transition_matrix_error_{norm}_norm',
         f'transition_matrix_true_{norm}_norm',
         f'transition_matrix_resampled_{norm}_norm',
+        f'weighted_transition_matrix_error_{norm}_norm',
     ]
 
 # Paths to the true and resampled models
-true_model_path = '/scratch/kwvanarem/xthreat-research-v1/model-storage/run-18-03-2025/true-models/'
-resampled_model_path = '/scratch/kwvanarem/xthreat-research-v1/model-storage/run-18-03-2025/resampled-models/'
+true_model_path = '/scratch/kwvanarem/xthreat-research-v2/model-storage/run-06-01-2026/true-models/'
+resampled_model_path = '/scratch/kwvanarem/xthreat-research-v2/model-storage/run-06-01-2026/resampled-models/'
 
 # Convert sampling_params to a list for distributing tasks
 tasks = list(sampling_params.items())
