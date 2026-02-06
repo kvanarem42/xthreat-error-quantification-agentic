@@ -1,6 +1,7 @@
 # Custom directories
 data-storage/
 0-model-storage/
+xT_ratings_resampled_10_000.parquet
 
 # Custom files
 to-do.txt
