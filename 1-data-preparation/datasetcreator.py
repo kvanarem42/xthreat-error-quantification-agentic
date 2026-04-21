@@ -153,6 +153,7 @@ final_columns = [
     'shot_statsbomb_xg',
     'pass_height',
     'under_pressure',
+    'position',
 ]
 
 redundant_events = [

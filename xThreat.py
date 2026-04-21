@@ -503,6 +503,7 @@ class xThreat:
                            edgecolors=None,
                            linewidths=0.01,
                            edge_alpha=1,
+                           half=False,
                            ):
         """Plot a heatmap on a pitch.
         Parameters:
@@ -524,7 +525,10 @@ class xThreat:
         # Create the pitch
         pitch = VerticalPitch(pitch_type='custom', line_zorder=2,
                               pitch_width=68, 
-                              pitch_length=105, line_color=line_color)
+                              pitch_length=105, 
+                              line_color=line_color,
+                              half=half,
+                              )
         fig, ax = pitch.draw(figsize=figsize)
 
         # Specify the x and y values
@@ -570,6 +574,7 @@ class xThreat:
                         edgecolors=None,
                         linewidths=0.01,
                         edge_alpha=1,
+                        half=False,
                         ):
         """Plot the xThreat values on the pitch.
         Parameters:
@@ -587,6 +592,7 @@ class xThreat:
             edgecolors=edgecolors,
             linewidths=linewidths,
             edge_alpha=edge_alpha,
+            half=half,
             )
         plt.show()
 
@@ -609,6 +615,7 @@ class xThreat:
                                     cmap = 'hot',
                                     figsize=(10.5, 6.8),
                                     line_color='black',
+                                    half=False,
                                     ):
         """Plot the initial distribution of the Markov chain.
         Parameters:
@@ -617,13 +624,21 @@ class xThreat:
         - line_color: The color of the lines on the pitch.
         """
         # Plot the heatmap
-        fig, ax, cbar = self.plot_pitch_heatmap(self.initial_distribution[:self.n_game_states], figsize=figsize, cmap=cmap, colorbar_label='Initial distribution', line_color=line_color)
+        fig, ax, cbar = self.plot_pitch_heatmap(
+            self.initial_distribution[:self.n_game_states], 
+            figsize=figsize, 
+            cmap=cmap, 
+            colorbar_label='Initial distribution', 
+            line_color=line_color,
+            half=half,
+            )
         plt.show()
 
     def plot_average_distribution(self,
                                     cmap = 'hot',
                                     figsize=(10.5, 6.8),
                                     line_color='black',
+                                    half=False,
                                     ):
         """Plot the average distribution of the data points.
         Parameters:
@@ -632,7 +647,14 @@ class xThreat:
         - line_color: The color of the lines on the pitch.
         """
         # Plot the heatmap
-        fig, ax, cbar = self.plot_pitch_heatmap(self.average_distribution[:self.n_game_states], figsize=figsize, cmap=cmap, colorbar_label='Average distribution', line_color=line_color)
+        fig, ax, cbar = self.plot_pitch_heatmap(
+            self.average_distribution[:self.n_game_states], 
+            figsize=figsize, 
+            cmap=cmap, 
+            colorbar_label='Average distribution', 
+            line_color=line_color,
+            half=half,
+            )
         plt.show()
 
     def plot_transitions_outgoing(self, 
@@ -642,6 +664,7 @@ class xThreat:
                                   figsize=(10.5, 6.8), 
                                   line_color='black',
                                   hide_current_state=False,
+                                  half=False,
                                   **square_kwargs,
                                   ):
         """Plot the transition probabilities of the outgoing transitions of a state.
@@ -667,18 +690,27 @@ class xThreat:
             values = values / np.sum(values)
 
         # Plot the heatmap
-        fig, ax, cbar = self.plot_pitch_heatmap(values, figsize=figsize, cmap=cmap, colorbar_label='Transition probabilities', line_color=line_color)
+        fig, ax, cbar = self.plot_pitch_heatmap(
+            values, 
+            figsize=figsize, 
+            cmap=cmap, 
+            colorbar_label='Transition\nprobabilities', 
+            line_color=line_color,
+            half=half,
+            )
         
         # Add a square to indicate the current state
         if hide_current_state == False:
             x_bin_size = (self.x_lims[1]-self.x_lims[0])/self.n_x
             y_bin_size = (self.y_lims[1]-self.y_lims[0])/self.n_y
+            if not 'edgecolor' in square_kwargs:
+                square_kwargs['edgecolor'] = 'blue'
             square = patches.Rectangle(
                 (y_i*y_bin_size, x_i*x_bin_size),
                 width=y_bin_size,
                 height=x_bin_size,
                 facecolor='none',
-                edgecolor='blue',
+                # edgecolor='blue',
                 **square_kwargs,
                 )
             ax.add_patch(square)
@@ -692,6 +724,7 @@ class xThreat:
                                   figsize=(10.5, 6.8), 
                                   line_color='black',
                                   hide_current_state=False,
+                                  half=False,
                                   **square_kwargs,
                                   ):
         # Calculate game state
@@ -705,7 +738,14 @@ class xThreat:
             values = values / np.sum(values)
 
         # Plot the heatmap
-        fig, ax, cbar = self.plot_pitch_heatmap(values, figsize=figsize, cmap=cmap, colorbar_label='Transition probabilities', line_color=line_color)
+        fig, ax, cbar = self.plot_pitch_heatmap(
+            values, 
+            figsize=figsize, 
+            cmap=cmap, 
+            colorbar_label='Transition probabilities', 
+            line_color=line_color,
+            half=half,
+            )
 
         # Add a square to indicate the current state
         if hide_current_state == False:
