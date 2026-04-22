@@ -1,13 +1,10 @@
 # Custom directories
 data-storage/
-model-storage/
+# model-storage/
 xT_ratings_resampled_10_000.parquet
 
 # Custom files
-to-do.txt
-xThreat_data_v2.parquet
-xThreat_data_v3.parquet
-temp.parquet
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
