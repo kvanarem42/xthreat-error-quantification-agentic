@@ -16,7 +16,7 @@ grid_sizes = [
               ]
 
 # Load the data
-data_path = '/home/kwvanarem/xthreat-research-v2/run-06-01-2026/1-data-preparation/data-storage/xThreat_data_v3.parquet'
+data_path = '/home/kwvanarem/xthreat-research-v2/run-06-01-2026/1-data-preparation/data-storage/preprocessed_data_top5_leagues.parquet'
 df_events = pd.read_parquet(data_path, engine='fastparquet')
 df_events['shot'] = ~df_events['shot_outcome'].isna()
 df_events['goal'] = df_events['shot_outcome'] == 'Goal'
