@@ -1,5 +1,7 @@
 # Custom directories
-data-storage/
+data-storage/**
+!data-storage/**/
+!data-storage/**/.gitkeep
 # model-storage/
 xT_ratings_resampled_10_000.parquet
 

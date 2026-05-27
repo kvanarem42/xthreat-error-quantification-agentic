@@ -31,16 +31,21 @@ Expected Threat (xT) models are widely used in football analytics to value ball 
 
 ```
 .
-├── xThreat.py                                     ← Core xT model class
+├── src/
+│   └── xthreat/
+│       ├── __init__.py
+│       └── model.py                                ← Core xT model class
 ├── requirements.txt
+├── pyproject.toml
 │
-├── 1-data-preparation/
+├── paper-2026/
+│   ├── 1-data-preparation/
 │   ├── download_clean_join.ipynb                  ← Main data pipeline notebook
 │   ├── datacleaner.py
 │   ├── datadownloader.py
 │   └── datasetcreator.py
 │
-├── 2-train-models/
+│   ├── 2-train-models/
 |   ├── sample_distribution.py                                  ← Example script to resample model
 │   ├── true-models/
 │   │   ├── calculate_true_models.py                            ← Script to precalculate the 'true' models.
@@ -52,7 +57,7 @@ Expected Threat (xT) models are widely used in football analytics to value ball 
 │       ├── xt-N100000-n_x16-n_y12-i_bootstrap42-...pickle      ← Example resampled models
 │       └── xt-N1300000-n_x64-n_y48-i_bootstrap169-...pickle    ← Example resampled models
 │
-├── 3-calculate-values/
+│   ├── 3-calculate-values/
 │   ├── s4.1-model-error-distribution/
 │   │   ├── calculate_values_normal_xthreat.py                  ← Scripts to calculate quantities from resampled models section s4.1.1
 │   │   ├── calculate_values_normal_xthreat_extended.py         ← Scripts to calculate quantities from resampled models section s4.1.1
@@ -66,7 +71,7 @@ Expected Threat (xT) models are widely used in football analytics to value ball 
 │           ├── calculate_resampled_player_ratings.py                 ← Script calculating player ratings from resampled models
 │           └── calculate_values_normal_xthreat.py                    ← Script calculating player ratings from ground truth models
 │
-└── 4-investigate-results/
+│   └── 4-investigate-results/
     ├── s4.1-distribution-model-error/
     │   ├── exploratory_analysis.ipynb              ← Notebook showing some extra visualizations
     │   ├── distribution_fitting.ipynb              ← Notebook fitting the distribution (S4.2.1)
@@ -81,15 +86,15 @@ Expected Threat (xT) models are widely used in football analytics to value ball 
 
 ---
 
-## `xThreat.py` — Core Model Class
+## `src/xthreat/model.py` — Core Model Class
 
-The backbone of this repository. `xThreat.py` implements the `XThreat` model class used across nearly all scripts and notebooks. It provides the main interface to **train, visualize, and apply** an Expected Threat model, and is a natural starting point if you want to understand or reuse the modelling framework.
+The backbone of this repository. `src/xthreat/model.py` implements the `XThreat` model class used across nearly all scripts and notebooks. It provides the main interface to **train, visualize, and apply** an Expected Threat model, and is a natural starting point if you want to understand or reuse the modelling framework.
 
 ---
 
 ## Part 1 — Data Preparation
 
-📁 `1-data-preparation/`
+📁 `paper-2026/1-data-preparation/`
 
 | File | Description |
 |------|-------------|
@@ -104,7 +109,7 @@ Run `download_clean_join.ipynb` first to produce the dataset used in all subsequ
 
 ## Part 2 — Model Training
 
-📁 `2-train-models/`
+📁 `paper-2026/2-train-models/`
 
 | Subfolder | Description |
 |-----------|-------------|
@@ -122,7 +127,7 @@ Run `download_clean_join.ipynb` first to produce the dataset used in all subsequ
 
 ## Part 3 — Calculate Values
 
-📁 `3-calculate-values/`
+📁 `paper-2026/3-calculate-values/`
 
 Contains the core computations that analyse the resampled models. Subfolders are labelled to match the paper's section numbering.
 
@@ -140,7 +145,7 @@ Contains the core computations that analyse the resampled models. Subfolders are
 
 ## Part 4 — Investigate Results
 
-📁 `4-investigate-results/`
+📁 `paper-2026/4-investigate-results/`
 
 > 🌟 **Recommended starting point for most visitors**
 
@@ -179,12 +184,13 @@ Notebooks that present the paper's findings. Subfolders correspond to paper sect
 
 ```bash
 pip install -r requirements.txt
+pip install -e .
 ```
 
 ### Recommended Workflow
 
 ```
-1-data-preparation  ──►  2-train-models  ──►  3-calculate-values  ──►  4-investigate-results
+paper-2026/1-data-preparation  ──►  paper-2026/2-train-models  ──►  paper-2026/3-calculate-values  ──►  paper-2026/4-investigate-results
 ```
 
 Most visitors can jump straight to **Part 4** — the notebooks allow for a quick visual inspection of the methods
